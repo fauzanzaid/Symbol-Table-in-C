@@ -10,20 +10,32 @@
 /////////////////////
 
 typedef struct SymbolEnv {
-
+	SymbolEnv_Scope *scp_root_ptr;
+	SymbolEnv_Scope *scp_cur_ptr;
+	SymbolEnv_Scope *scp_last_child_ptr;
 }SymbolEnv;
 
 typedef struct SymbolEnv_Scope {
+	SymbolEnv env_ptr;
 
+	SymbolEnv_Scope *parent;
+	SymbolEnv_Scope *sibling;
+	SymbolEnv_Scope *child;
+
+	char *name;
+	int len_name;
+
+	HashTable *tbl_ptr;
 }SymbolEnv_Scope;
 
 typedef struct SymbolEnv_Entry {
+	SymbolEnv_Scope *scp_ptr;
 
+	char *id;
+	int len_id;
+	int size;
+	SymbolEnv_Type *type_ptr;
 }SymbolEnv_Entry;
-
-typedef struct SymbolEnv_Type {
-
-}SymbolEnv_Type;
 
 
 ////////////////////
@@ -56,19 +68,19 @@ void SymbolEnv_Type_destroy(SymbolEnv_Type *type_ptr){
 }
 
 static SymbolEnv_Scope* SymbolEnv_Scope_new(){
-	
+
 }
 
 static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
-	
+
 }
 
 static SymbolEnv_Entry *SymbolEnv_Entry_new(){
-	
+
 }
 
 static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr){
-	
+
 }
 
 
