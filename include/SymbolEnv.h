@@ -76,7 +76,7 @@ SymbolEnv_Scope *SymbolEnv_scope_exit(SymbolEnv *env_ptr);
  * @param  env_ptr Pointer to SymbolEnv struct
  * @return         Pointer to home scope
  */
-SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr)
+SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr);
 
 /**
  * Fetch current environment's scope
@@ -102,7 +102,7 @@ SymbolEnv_Scope *SymbolEnv_scope_set_dfs(SymbolEnv *env_ptr);
  * @param  scp_ptr Pointer to the scope which should be set
  * @return         Pointer to the set scope, or NULL if the scope is not valid
  */
-SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_scope *scp_ptr);
+SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr);
 
 
 /////////////
