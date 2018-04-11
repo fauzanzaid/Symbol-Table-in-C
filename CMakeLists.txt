@@ -18,3 +18,8 @@ if(NOT TARGET HashTable)
 	add_subdirectory(${CMAKE_SOURCE_DIR}/ext/HashTable ${CMAKE_SOURCE_DIR}/ext/HashTable/build/bin)
 endif(NOT TARGET HashTable)
 target_link_libraries(SymbolEnv HashTable)
+
+if(NOT TARGET LinkedList)
+	add_subdirectory(${CMAKE_SOURCE_DIR}/ext/LinkedList ${CMAKE_SOURCE_DIR}/ext/LinkedList/build/bin)
+endif(NOT TARGET LinkedList)
+target_link_libraries(SymbolEnv LinkedList)
