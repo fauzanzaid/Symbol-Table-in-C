@@ -1,8 +1,17 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "HashTable.h"
+#include "LinkedList.h"
 
 #include "SymbolEnv.h"
+
+
+///////////////
+// Constants //
+///////////////
+
+static const int HASHTABLE_SIZE = 31;
 
 
 /////////////////////
@@ -16,7 +25,7 @@ typedef struct SymbolEnv {
 }SymbolEnv;
 
 typedef struct SymbolEnv_Scope {
-	SymbolEnv env_ptr;
+	SymbolEnv *env_ptr;
 
 	SymbolEnv_Scope *parent;
 	SymbolEnv_Scope *sibling;
@@ -26,6 +35,8 @@ typedef struct SymbolEnv_Scope {
 	int len_name;
 
 	HashTable *tbl_ptr;
+	// id_lst maintains the keys of the hashtable
+	LinkedList *id_lst_ptr;
 }SymbolEnv_Scope;
 
 typedef struct SymbolEnv_Entry {
@@ -42,13 +53,17 @@ typedef struct SymbolEnv_Entry {
 // Pvt Prototypes //
 ////////////////////
 
-static SymbolEnv_Scope* SymbolEnv_Scope_new();
+static SymbolEnv_Scope* SymbolEnv_Scope_new(SymbolEnv *env_ptr, char *name, int len_name);
 
 static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr);
 
-static SymbolEnv_Entry *SymbolEnv_Entry_new();
+static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr);
 
 static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr);
+
+static int hash_function(void *key);
+
+static int key_compare(void *key1, void *key2);
 
 
 //////////////////////////////////
@@ -56,31 +71,88 @@ static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr);
 //////////////////////////////////
 
 SymbolEnv *SymbolEnv_new(){
+	SymbolEnv *env_ptr = malloc( sizeof(SymbolEnv) );
 
+	env_ptr->scp_root_ptr = SymbolEnv_Scope_new(env_ptr, NULL, 0);
+	env_ptr->scp_cur_ptr = env_ptr->scp_root_ptr;
+	env_ptr->scp_last_child_ptr = NULL;
+
+	return env_ptr;
 }
 
 void SymbolEnv_destroy(SymbolEnv *env_ptr){
+	LinkedList *stack =  LinkedList_new();
 
+	LinkedList_push(stack, env_ptr);
+
+	while( LinkedList_peek(stack) != NULL ){
+		SymbolEnv_Scope *current = LinkedList_pop(stack);
+
+		// Push all children on to stack
+		SymbolEnv_Scope *child = current->child;
+		while(child){
+			LinkedList_push(stack, child);
+			child = child->sibling;
+		}
+
+		SymbolEnv_Scope_destroy(current);
+	}
+	LinkedList_destroy(stack);
+
+	free(env_ptr);
 }
 
-void SymbolEnv_Type_destroy(SymbolEnv_Type *type_ptr){
+static SymbolEnv_Scope* SymbolEnv_Scope_new(SymbolEnv *env_ptr, char *name, int len_name){
+	SymbolEnv_Scope *scp_ptr = malloc( sizeof(SymbolEnv_Scope) );
 
-}
+	scp_ptr->env_ptr = env_ptr;
+	scp_ptr->parent = NULL;
+	scp_ptr->child = NULL;
+	scp_ptr->sibling = NULL;
 
-static SymbolEnv_Scope* SymbolEnv_Scope_new(){
+	scp_ptr->name = malloc( sizeof(char) * (len_name+1) );
+	strncpy(scp_ptr->name, name, len_name);
+	scp_ptr->name[len_name] = '\0';
+	scp_ptr->len_name = len_name+1;
 
+	scp_ptr->tbl_ptr = HashTable_new(HASHTABLE_SIZE, hash_function, key_compare);
+	scp_ptr->id_lst_ptr = LinkedList_new();
 }
 
 static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
+	if(scp_ptr->name != NULL)
+		free(scp_ptr->name);
 
+	while( LinkedList_peek(scp_ptr->id_lst_ptr) != NULL ){
+		char *id = LinkedList_pop(scp_ptr->id_lst_ptr);
+		SymbolEnv_Entry *etr_ptr = HashTable_get(scp_ptr->tbl_ptr, id);
+		SymbolEnv_Entry_destroy(etr_ptr);
+	}
+
+	HashTable_destroy(scp_ptr->tbl_ptr);
+	LinkedList_destroy(scp_ptr->id_lst_ptr);
 }
 
-static SymbolEnv_Entry *SymbolEnv_Entry_new(){
+static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr){
+	SymbolEnv_Entry *etr_ptr = malloc( sizeof(SymbolEnv_Entry) );
 
+	etr_ptr->scp_ptr = scp_ptr;
+
+	etr_ptr->id = malloc( sizeof(char) * (len_id+1) );
+	strncpy(etr_ptr->id, id, len_id);
+	etr_ptr->id[len_id] = '\0';
+	etr_ptr->len_id = len_id;
+
+	etr_ptr->size = size;
+	etr_ptr->type_ptr = type_ptr;
+
+	return etr_ptr;
 }
 
 static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr){
-
+	free(etr_ptr->id);
+	if(etr_ptr->type_ptr != NULL)
+		SymbolEnv_Type_destroy(etr_ptr->type_ptr);
 }
 
 
@@ -143,4 +215,26 @@ SymbolEnv_Type *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr){
 
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr){
 
+}
+
+
+/////////////
+// Hashing //
+/////////////
+
+static int hash_function(void *key){
+	char *string = (char *)key;
+	int hash = 5381;
+	int c;
+	while(c = *string++)
+		hash = ((hash << 5) + hash) + c;
+
+	if(hash<0)
+		return -hash;
+	else
+		return hash;
+}
+
+static int key_compare(void *key1, void *key2){
+	return strcmp((char *)key1, (char *)key2);
 }
