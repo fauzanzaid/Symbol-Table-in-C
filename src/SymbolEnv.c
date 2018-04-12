@@ -194,7 +194,17 @@ SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scop
 /////////////
 
 SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, void *type_ptr){
+	SymbolEnv_Scope *scp_ptr = env_ptr->scp_cur_ptr;
+	SymbolEnv_Entry *etr_ptr = SymbolEnv_Entry_new(scp_ptr, id, len_id, size, type_ptr);
 
+	if( HashTable_get(scp_ptr->tbl_ptr, etr_ptr->id) != NULL){
+		// Symbol already exists in current scope
+		SymbolEnv_Entry_destroy(etr_ptr);
+		return NULL;
+	}
+
+	LinkedList_push(scp_ptr->id_lst_ptr, etr_ptr->id);
+	HashTable_add(scp_ptr->tbl_ptr, etr_ptr->id, etr_ptr);
 }
 
 SymbolEnv_Entry *SymbolEnv_entry_get_by_id(SymbolEnv *env_ptr, char *id, int len_id){
