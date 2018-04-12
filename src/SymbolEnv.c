@@ -83,7 +83,7 @@ SymbolEnv *SymbolEnv_new(){
 void SymbolEnv_destroy(SymbolEnv *env_ptr){
 	LinkedList *stack =  LinkedList_new();
 
-	LinkedList_push(stack, env_ptr);
+	LinkedList_push(stack, env_ptr->scp_root_ptr);
 
 	while( LinkedList_peek(stack) != NULL ){
 		SymbolEnv_Scope *current = LinkedList_pop(stack);
@@ -131,6 +131,8 @@ static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
 
 	HashTable_destroy(scp_ptr->tbl_ptr);
 	LinkedList_destroy(scp_ptr->id_lst_ptr);
+
+	free(scp_ptr);
 }
 
 static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr){
@@ -153,6 +155,8 @@ static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr){
 	free(etr_ptr->id);
 	if(etr_ptr->type_ptr != NULL)
 		SymbolEnv_Type_destroy(etr_ptr->type_ptr);
+
+	free(etr_ptr);
 }
 
 
