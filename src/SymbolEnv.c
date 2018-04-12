@@ -45,7 +45,7 @@ typedef struct SymbolEnv_Entry {
 	char *id;
 	int len_id;
 	int size;
-	SymbolEnv_Type *type_ptr;
+	void *type_ptr;
 }SymbolEnv_Entry;
 
 
@@ -57,7 +57,7 @@ static SymbolEnv_Scope* SymbolEnv_Scope_new(SymbolEnv *env_ptr, char *name, int 
 
 static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr);
 
-static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr);
+static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, void *type_ptr);
 
 static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr);
 
@@ -135,7 +135,7 @@ static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
 	free(scp_ptr);
 }
 
-static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr){
+static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, void *type_ptr){
 	SymbolEnv_Entry *etr_ptr = malloc( sizeof(SymbolEnv_Entry) );
 
 	etr_ptr->scp_ptr = scp_ptr;
@@ -193,7 +193,7 @@ SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scop
 // Entries //
 /////////////
 
-SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr){
+SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, void *type_ptr){
 
 }
 
@@ -213,7 +213,7 @@ int SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr){
 
 }
 
-SymbolEnv_Type *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr){
+void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr){
 
 }
 

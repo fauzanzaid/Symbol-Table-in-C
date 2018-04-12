@@ -21,11 +21,6 @@ typedef struct SymbolEnv_Scope SymbolEnv_Scope;
  */
 typedef struct SymbolEnv_Entry SymbolEnv_Entry;
 
-/**
- * User defined struct to hold type information about symbols
- */
-typedef struct SymbolEnv_Type SymbolEnv_Type;
-
 
 //////////////////////////////////
 // Constructors and Destructors //
@@ -49,7 +44,7 @@ void SymbolEnv_destroy(SymbolEnv *env_ptr);
  * User defined function to deallocate a SymbolEnv_Type struct
  * @param type_ptr Pointer to SymbolEnv_Type struct
  */
-void SymbolEnv_Type_destroy(SymbolEnv_Type *type_ptr);
+void SymbolEnv_Type_destroy(void *type_ptr);
 
 ///////////
 // Scope //
@@ -118,11 +113,11 @@ SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scop
  * be changed later if it is set to 0
  * @param  type_ptr Pointer to a user allocated SymbolEnv_Type struct for the
  * symbol. The struct will be deallocated by the user defined destructor for the
- * SymbolEnv_Type struct
+ * void    struct
  * @return          Returns a pointer to entry created, NULL if an
  * entry with same id already exists.
  */
-SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, SymbolEnv_Type *type_ptr);
+SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, void *type_ptr);
 
 /**
  * Fetch an entry by it's identifier
@@ -145,7 +140,7 @@ int SymbolEnv_Entry_get_size(SymbolEnv_Entry *etr_ptr);
  */
 int SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr);
 
-SymbolEnv_Type *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr);
+void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr);
 
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr);
 
