@@ -165,27 +165,84 @@ static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr){
 ///////////
 
 SymbolEnv_Scope *SymbolEnv_scope_add(SymbolEnv *env_ptr, char *name, int len_name){
+	// printf("SymbolEnv_scope_add : %*s\n", len_name, name);
+	SymbolEnv_Scope *scp_ptr = SymbolEnv_Scope_new(env_ptr, name, len_name);
 
+	scp_ptr->parent = env_ptr->scp_cur_ptr;
+	// Add scope to tree
+	if(env_ptr->scp_last_child_ptr == NULL){
+		// Add scope as left most child
+		scp_ptr->sibling = scp_ptr->parent->child;
+		scp_ptr->parent->child = scp_ptr;
+	}
+	else{
+		// Add scope to the right of last child
+		scp_ptr->sibling = env_ptr->scp_last_child_ptr->sibling;
+		env_ptr->scp_last_child_ptr->sibling = scp_ptr;
+	}
+
+	// Enter the scope
+	env_ptr->scp_cur_ptr = scp_ptr;
+	env_ptr->scp_last_child_ptr = NULL;
+
+	return scp_ptr;
+}
+
+SymbolEnv_Scope *SymbolEnv_scope_enter(SymbolEnv *env_ptr){
+	if(env_ptr->scp_last_child_ptr == NULL){
+		if(env_ptr->scp_cur_ptr->child == NULL){
+			return NULL;
+		}
+
+		else{
+			env_ptr->scp_cur_ptr = env_ptr->scp_cur_ptr->child;
+			env_ptr->scp_last_child_ptr = NULL;
+
+			return env_ptr->scp_cur_ptr;
+		}
+	}
+
+	else{
+		if(env_ptr->scp_last_child_ptr->sibling == NULL){
+			return NULL;
+		}
+
+		else{
+			env_ptr->scp_cur_ptr = env_ptr->scp_last_child_ptr->sibling;
+			env_ptr->scp_last_child_ptr = NULL;
+
+			return env_ptr->scp_cur_ptr;
+		}
+	}
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_exit(SymbolEnv *env_ptr){
+	if(env_ptr->scp_cur_ptr->parent == NULL)
+		return NULL;
 
+	env_ptr->scp_last_child_ptr = env_ptr->scp_cur_ptr;
+	env_ptr->scp_cur_ptr = env_ptr->scp_cur_ptr->parent;
+
+	return env_ptr->scp_cur_ptr->parent;
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr){
+	env_ptr->scp_cur_ptr = env_ptr->scp_root_ptr;
+	env_ptr->scp_last_child_ptr = NULL;
 
+	return env_ptr->scp_cur_ptr;
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr){
-
-}
-
-SymbolEnv_Scope *SymbolEnv_scope_set_dfs(SymbolEnv *env_ptr){
-
+	return env_ptr->scp_cur_ptr->parent;
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr){
+	if(scp_ptr->env_ptr != env_ptr)
+		return NULL;
 
+	env_ptr->scp_cur_ptr = scp_ptr;
+	env_ptr->scp_last_child_ptr = NULL;
 }
 
 

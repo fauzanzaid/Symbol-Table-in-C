@@ -60,6 +60,14 @@ void SymbolEnv_Type_destroy(void *type_ptr);
 SymbolEnv_Scope *SymbolEnv_scope_add(SymbolEnv *env_ptr, char *name, int len_name);
 
 /**
+ * Changes the environment scope to the next unvisited child, if it exists
+ * @param  env_ptr Pointer to SymbolEnv struct
+ * @return         Pointer to the child scope, NULL if no children left to be
+ * visited
+ */
+SymbolEnv_Scope *SymbolEnv_scope_enter(SymbolEnv *env_ptr);
+
+/**
  * Changes the environment scope to the parent, if it exists
  * @param  env_ptr Pointer to SymbolEnv struct
  * @return         Pointer to the parent scope, NULL if no parent
@@ -79,16 +87,6 @@ SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr);
  * @return         POinter to current scope
  */
 SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr);
-
-/**
- * Sets the environment's scope to the next scope which will be visited in
- * triple order traversal. The scope to be set is an unvisited child, or if none
- * exists, the parent, or if parent does not exist, stops. When scope is reset
- * or set explicitly, all children all considered unvisited
- * @param  env_ptr Pointer to SymbolEnv struct
- * @return         Pointer to the next scope which is set, NULL if none exists
- */
-SymbolEnv_Scope *SymbolEnv_scope_set_dfs(SymbolEnv *env_ptr);
 
 /**
  * Sets the environment's scope to the scope whose reference pointer is given.
