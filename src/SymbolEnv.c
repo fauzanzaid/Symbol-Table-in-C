@@ -165,8 +165,9 @@ static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr){
 ///////////
 
 SymbolEnv_Scope *SymbolEnv_scope_add(SymbolEnv *env_ptr, char *name, int len_name){
-	// printf("SymbolEnv_scope_add : %*s\n", len_name, name);
+
 	SymbolEnv_Scope *scp_ptr = SymbolEnv_Scope_new(env_ptr, name, len_name);
+	// printf("SymbolEnv_scope_add : %s\n", scp_ptr->name);
 
 	scp_ptr->parent = env_ptr->scp_cur_ptr;
 	// Add scope to tree
@@ -223,7 +224,7 @@ SymbolEnv_Scope *SymbolEnv_scope_exit(SymbolEnv *env_ptr){
 	env_ptr->scp_last_child_ptr = env_ptr->scp_cur_ptr;
 	env_ptr->scp_cur_ptr = env_ptr->scp_cur_ptr->parent;
 
-	return env_ptr->scp_cur_ptr->parent;
+	return env_ptr->scp_cur_ptr;
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr){
@@ -234,7 +235,7 @@ SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr){
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr){
-	return env_ptr->scp_cur_ptr->parent;
+	return env_ptr->scp_cur_ptr;
 }
 
 SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr){
@@ -243,6 +244,10 @@ SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scop
 
 	env_ptr->scp_cur_ptr = scp_ptr;
 	env_ptr->scp_last_child_ptr = NULL;
+}
+
+char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr){
+	return scp_ptr->name;
 }
 
 
@@ -265,27 +270,43 @@ SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, i
 }
 
 SymbolEnv_Entry *SymbolEnv_entry_get_by_id(SymbolEnv *env_ptr, char *id, int len_id){
+	SymbolEnv_Scope *scp_ptr = env_ptr->scp_cur_ptr;
 
+	// Add null terminator
+	char id_2[len_id+1];
+	strncpy(id_2, id, len_id);
+	id_2[len_id] = '\0';
+
+	while(scp_ptr != NULL){
+		SymbolEnv_Entry *etr_ptr = HashTable_get(scp_ptr->tbl_ptr, id_2);
+
+		if(etr_ptr != NULL)
+			return etr_ptr;
+
+		scp_ptr = scp_ptr->parent;
+	}
+
+	return NULL;
 }
 
 char *SymbolEnv_Entry_get_id(SymbolEnv_Entry *etr_ptr){
-
+	return etr_ptr->id;
 }
 
 int SymbolEnv_Entry_get_size(SymbolEnv_Entry *etr_ptr){
-
+	return etr_ptr->size;
 }
 
-int SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr){
-
+void SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr, int size){
+	etr_ptr->size = size;
 }
 
 void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr){
-
+	return etr_ptr->type_ptr;
 }
 
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr){
-
+	return etr_ptr->scp_ptr;
 }
 
 

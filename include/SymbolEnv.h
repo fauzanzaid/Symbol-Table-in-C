@@ -97,6 +97,7 @@ SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr);
  */
 SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr);
 
+char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr);
 
 /////////////
 // Entries //
@@ -133,10 +134,8 @@ int SymbolEnv_Entry_get_size(SymbolEnv_Entry *etr_ptr);
 /**
  * Set the size in bytes to be allocated from the memory for the symbol
  * @param  etr_ptr Pointer to the symbol's entry
- * @return         0 on success. -1 on failure to set size, as it has already
- * been set before
  */
-int SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr);
+void SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr, int size);
 
 void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr);
 
