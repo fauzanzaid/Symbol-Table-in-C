@@ -289,6 +289,10 @@ SymbolEnv_Scope *SymbolEnv_Scope_get_inorder(SymbolEnv_Scope *scp_ptr){
 	}
 }
 
+SymbolEnv_Scope *SymbolEnv_Scope_get_parent(SymbolEnv_Scope *scp_ptr){
+	return scp_ptr->parent;
+}
+
 
 /////////////
 // Entries //
