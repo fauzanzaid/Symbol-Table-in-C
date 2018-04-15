@@ -127,6 +127,10 @@ SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, i
  */
 SymbolEnv_Entry *SymbolEnv_entry_get_by_id(SymbolEnv *env_ptr, char *id, int len_id);
 
+int SymbolEnv_entry_set_flag_initialized_by_id(SymbolEnv *env_ptr, char *id, int len_id);
+
+int SymbolEnv_entry_get_flag_initialized_by_id(SymbolEnv *env_ptr, char *id, int len_id);
+
 char *SymbolEnv_Entry_get_id(SymbolEnv_Entry *etr_ptr);
 
 int SymbolEnv_Entry_get_size(SymbolEnv_Entry *etr_ptr);
@@ -140,6 +144,10 @@ void SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr, int size);
 void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr);
 
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr);
+
+void SymbolEnv_Entry_set_flag_initialized(SymbolEnv_Entry *etr_ptr);
+
+int SymbolEnv_Entry_get_flag_initialized(SymbolEnv_Entry *etr_ptr);
 
 
 #endif

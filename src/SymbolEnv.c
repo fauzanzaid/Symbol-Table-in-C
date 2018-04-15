@@ -46,6 +46,8 @@ typedef struct SymbolEnv_Entry {
 	int len_id;
 	int size;
 	void *type_ptr;
+
+	int flag_initialized;
 }SymbolEnv_Entry;
 
 
@@ -147,6 +149,8 @@ static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, 
 
 	etr_ptr->size = size;
 	etr_ptr->type_ptr = type_ptr;
+
+	etr_ptr->flag_initialized = 0;
 
 	return etr_ptr;
 }
@@ -289,6 +293,28 @@ SymbolEnv_Entry *SymbolEnv_entry_get_by_id(SymbolEnv *env_ptr, char *id, int len
 	return NULL;
 }
 
+
+int SymbolEnv_entry_set_flag_initialized_by_id(SymbolEnv *env_ptr, char *id, int len_id){
+	SymbolEnv_Entry *etr_ptr = SymbolEnv_entry_get_by_id(env_ptr, id, len_id);
+
+	if(etr_ptr == NULL)
+		return -1;
+
+	etr_ptr->flag_initialized = 1;
+
+	return 0;
+}
+
+int SymbolEnv_entry_get_flag_initialized_by_id(SymbolEnv *env_ptr, char *id, int len_id){
+	SymbolEnv_Entry *etr_ptr = SymbolEnv_entry_get_by_id(env_ptr, id, len_id);
+
+	if(etr_ptr == NULL)
+		return -1;
+
+	return etr_ptr->flag_initialized;
+}
+
+
 char *SymbolEnv_Entry_get_id(SymbolEnv_Entry *etr_ptr){
 	return etr_ptr->id;
 }
@@ -308,6 +334,15 @@ void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr){
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr){
 	return etr_ptr->scp_ptr;
 }
+
+void SymbolEnv_Entry_set_flag_initialized(SymbolEnv_Entry *etr_ptr){
+	etr_ptr->flag_initialized = 1;
+}
+
+int SymbolEnv_Entry_get_flag_initialized(SymbolEnv_Entry *etr_ptr){
+	return etr_ptr->flag_initialized;
+}
+
 
 
 /////////////
