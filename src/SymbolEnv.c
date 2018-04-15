@@ -130,10 +130,24 @@ static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
 	if(scp_ptr->name != NULL)
 		free(scp_ptr->name);
 
-	while( LinkedList_peek(scp_ptr->id_lst_ptr) != NULL ){
-		char *id = LinkedList_pop(scp_ptr->id_lst_ptr);
+	LinkedListIterator *itr_ptr = LinkedListIterator_new(scp_ptr->id_lst_ptr);
+	LinkedListIterator_move_to_first(itr_ptr);
+
+	char *id = LinkedListIterator_get_item(itr_ptr);
+	while(id != NULL){
+		printf("%p %s\n", id, id);
+
 		SymbolEnv_Entry *etr_ptr = HashTable_get(scp_ptr->tbl_ptr, id);
 		SymbolEnv_Entry_destroy(etr_ptr);
+
+		LinkedListIterator_move_to_next(itr_ptr);
+		id = LinkedListIterator_get_item(itr_ptr);
+	}
+	LinkedListIterator_destroy(itr_ptr);
+
+	// Can free id now, as hashtable will no longer be used
+	while( LinkedList_peek(scp_ptr->id_lst_ptr) ){
+		free( LinkedList_pop(scp_ptr->id_lst_ptr) );
 	}
 
 	HashTable_destroy(scp_ptr->tbl_ptr);
@@ -162,11 +176,11 @@ static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, 
 }
 
 static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr){
-	free(etr_ptr->id);
 	if(etr_ptr->type_ptr != NULL)
 		SymbolEnv_Type_destroy(etr_ptr->type_ptr);
 
 	free(etr_ptr);
+	// id will be freed later, as it will be used by hashtable get
 }
 
 
