@@ -258,6 +258,37 @@ LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr){
 	return scp_ptr->id_lst_ptr;
 }
 
+SymbolEnv_Scope *SymbolEnv_Scope_get_inorder(SymbolEnv_Scope *scp_ptr){
+	if(scp_ptr->child != NULL){
+		// Move to child if it exists
+		return scp_ptr->child;
+	}
+	else if(scp_ptr->sibling != NULL){
+		// Else, move to sibling if it exists
+		return scp_ptr->sibling;
+	}
+	else{
+		// Else, move to the sibling of the first ancestor who has one
+		SymbolEnv_Scope *current = scp_ptr;
+
+		while(1){
+			if(current->parent == NULL){
+				// No such ancestor exists, given node was the rightmost
+				return NULL;
+			}
+			else if(current->parent->sibling == NULL){
+				// Immediate parent does not have a sibling, move to next
+				// parent
+				current = current->parent;
+			}
+			else{
+				// Immediate parent has a sibling
+				return current->parent->sibling;
+			}
+		}
+	}
+}
+
 
 /////////////
 // Entries //
