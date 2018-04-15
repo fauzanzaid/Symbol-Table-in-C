@@ -2,6 +2,9 @@
 #define INCLUDE_GUARD_1A368492455A426692606488F5BD21F0
 
 
+#include "LinkedList.h"
+
+
 /////////////////////
 // Data Structures //
 /////////////////////
@@ -98,6 +101,9 @@ SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr);
 SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr);
 
 char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr);
+
+LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr);
+
 
 /////////////
 // Entries //

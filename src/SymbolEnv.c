@@ -254,6 +254,10 @@ char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr){
 	return scp_ptr->name;
 }
 
+LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr){
+	return scp_ptr->id_lst_ptr;
+}
+
 
 /////////////
 // Entries //
@@ -271,6 +275,8 @@ SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, i
 
 	LinkedList_push(scp_ptr->id_lst_ptr, etr_ptr->id);
 	HashTable_add(scp_ptr->tbl_ptr, etr_ptr->id, etr_ptr);
+
+	return etr_ptr;
 }
 
 SymbolEnv_Entry *SymbolEnv_entry_get_by_id(SymbolEnv *env_ptr, char *id, int len_id){
