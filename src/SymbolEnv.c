@@ -31,6 +31,8 @@ typedef struct SymbolEnv_Scope {
 	SymbolEnv_Scope *sibling;
 	SymbolEnv_Scope *child;
 
+	int nesting;
+
 	char *name;
 	int len_name;
 
@@ -46,6 +48,7 @@ typedef struct SymbolEnv_Entry {
 	int len_id;
 	int size;
 	void *type_ptr;
+	int offset;
 
 	int flag_initialized;
 }SymbolEnv_Entry;
@@ -112,6 +115,8 @@ static SymbolEnv_Scope* SymbolEnv_Scope_new(SymbolEnv *env_ptr, char *name, int 
 	scp_ptr->child = NULL;
 	scp_ptr->sibling = NULL;
 
+	scp_ptr->nesting = 0;
+
 	scp_ptr->name = malloc( sizeof(char) * (len_name+1) );
 	strncpy(scp_ptr->name, name, len_name);
 	scp_ptr->name[len_name] = '\0';
@@ -149,6 +154,7 @@ static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, 
 
 	etr_ptr->size = size;
 	etr_ptr->type_ptr = type_ptr;
+	etr_ptr->offset = 0;
 
 	etr_ptr->flag_initialized = 0;
 
@@ -185,6 +191,8 @@ SymbolEnv_Scope *SymbolEnv_scope_add(SymbolEnv *env_ptr, char *name, int len_nam
 		scp_ptr->sibling = env_ptr->scp_last_child_ptr->sibling;
 		env_ptr->scp_last_child_ptr->sibling = scp_ptr;
 	}
+
+	scp_ptr->nesting = env_ptr->scp_cur_ptr->nesting + 1;
 
 	// Enter the scope
 	env_ptr->scp_cur_ptr = scp_ptr;
@@ -256,6 +264,10 @@ char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr){
 
 LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr){
 	return scp_ptr->id_lst_ptr;
+}
+
+int SymbolEnv_Scope_get_nesting_level(SymbolEnv_Scope *scp_ptr){
+	return scp_ptr->nesting;
 }
 
 SymbolEnv_Scope *SymbolEnv_Scope_get_inorder(SymbolEnv_Scope *scp_ptr){
@@ -370,6 +382,10 @@ void SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr, int size){
 
 void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr){
 	return etr_ptr->type_ptr;
+}
+
+int SymbolEnv_Entry_get_offset(SymbolEnv_Entry *etr_ptr){
+	return etr_ptr->offset;
 }
 
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr){

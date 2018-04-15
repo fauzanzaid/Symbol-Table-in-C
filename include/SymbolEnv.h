@@ -104,6 +104,8 @@ char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr);
 
 LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr);
 
+int SymbolEnv_Scope_get_nesting_level(SymbolEnv_Scope *scp_ptr);
+
 SymbolEnv_Scope *SymbolEnv_Scope_get_inorder(SymbolEnv_Scope *scp_ptr);
 
 SymbolEnv_Scope *SymbolEnv_Scope_get_parent(SymbolEnv_Scope *scp_ptr);
@@ -152,6 +154,8 @@ int SymbolEnv_Entry_get_size(SymbolEnv_Entry *etr_ptr);
 void SymbolEnv_Entry_set_size(SymbolEnv_Entry *etr_ptr, int size);
 
 void *SymbolEnv_Entry_get_type(SymbolEnv_Entry *etr_ptr);
+
+int SymbolEnv_Entry_get_offset(SymbolEnv_Entry *etr_ptr);
 
 SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr);
 
