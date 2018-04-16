@@ -466,12 +466,14 @@ void SymbolEnv_layout_memory(SymbolEnv *env_ptr, int(*get_type_width)(void *) ){
 
 		while(id){
 			SymbolEnv_Entry *etr_ptr = SymbolEnv_Scope_entry_get_by_id(scp_ptr, id, strlen(id));
-
 			void *type_ptr = SymbolEnv_Entry_get_type(etr_ptr);
 
-			etr_ptr->offset = env_ptr->memory_allocated;
-			etr_ptr->size = get_type_width(type_ptr);
-			env_ptr->memory_allocated += etr_ptr->size;
+			int size = get_type_width(type_ptr);
+			if(size > 0){
+				etr_ptr->offset = env_ptr->memory_allocated;
+				etr_ptr->size = size;
+				env_ptr->memory_allocated += size;
+			}
 
 			LinkedListIterator_move_to_next(itr_ptr);
 			id = LinkedListIterator_get_item(itr_ptr);
