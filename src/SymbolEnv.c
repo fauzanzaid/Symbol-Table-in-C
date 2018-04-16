@@ -22,6 +22,8 @@ typedef struct SymbolEnv {
 	SymbolEnv_Scope *scp_root_ptr;
 	SymbolEnv_Scope *scp_cur_ptr;
 	SymbolEnv_Scope *scp_last_child_ptr;
+
+	int memory_allocated;
 }SymbolEnv;
 
 typedef struct SymbolEnv_Scope {
@@ -62,7 +64,7 @@ static SymbolEnv_Scope* SymbolEnv_Scope_new(SymbolEnv *env_ptr, char *name, int 
 
 static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr);
 
-static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, void *type_ptr);
+static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int size, void *type_ptr);
 
 static void SymbolEnv_Entry_destroy(SymbolEnv_Entry *etr_ptr);
 
@@ -81,6 +83,8 @@ SymbolEnv *SymbolEnv_new(char *name, int len_name){
 	env_ptr->scp_root_ptr = SymbolEnv_Scope_new(env_ptr, name, len_name);
 	env_ptr->scp_cur_ptr = env_ptr->scp_root_ptr;
 	env_ptr->scp_last_child_ptr = NULL;
+
+	env_ptr->memory_allocated = 0;
 
 	return env_ptr;
 }
@@ -154,7 +158,7 @@ static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
 	free(scp_ptr);
 }
 
-static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, int size, void *type_ptr){
+static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, int len_id, void *type_ptr){
 	SymbolEnv_Entry *etr_ptr = malloc( sizeof(SymbolEnv_Entry) );
 
 	etr_ptr->scp_ptr = scp_ptr;
@@ -164,8 +168,8 @@ static SymbolEnv_Entry *SymbolEnv_Entry_new(SymbolEnv_Scope *scp_ptr, char *id, 
 	etr_ptr->id[len_id] = '\0';
 	etr_ptr->len_id = len_id;
 
-	etr_ptr->size = size;
 	etr_ptr->type_ptr = type_ptr;
+	etr_ptr->size = 0;
 	etr_ptr->offset = 0;
 
 	etr_ptr->flag_initialized = 0;
@@ -331,9 +335,9 @@ SymbolEnv_Scope *SymbolEnv_Scope_get_parent(SymbolEnv_Scope *scp_ptr){
 // Entries //
 /////////////
 
-SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, void *type_ptr){
+SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, void *type_ptr){
 	SymbolEnv_Scope *scp_ptr = env_ptr->scp_cur_ptr;
-	SymbolEnv_Entry *etr_ptr = SymbolEnv_Entry_new(scp_ptr, id, len_id, size, type_ptr);
+	SymbolEnv_Entry *etr_ptr = SymbolEnv_Entry_new(scp_ptr, id, len_id, type_ptr);
 
 	if( HashTable_get(scp_ptr->tbl_ptr, etr_ptr->id) != NULL){
 		// Symbol already exists in current scope
@@ -443,4 +447,37 @@ static int hash_function(void *key){
 
 static int key_compare(void *key1, void *key2){
 	return strcmp((char *)key1, (char *)key2);
+}
+
+
+////////////
+// Layout //
+////////////
+
+void SymbolEnv_layout_memory(SymbolEnv *env_ptr, int(*get_type_width)(void *) ){
+	SymbolEnv_Scope *scp_ptr = env_ptr->scp_root_ptr;
+
+	while(scp_ptr){
+		LinkedList *id_lst_ptr = SymbolEnv_Scope_get_id_lst(scp_ptr);
+
+		LinkedListIterator *itr_ptr = LinkedListIterator_new(id_lst_ptr);
+		LinkedListIterator_move_to_first(itr_ptr);
+		char *id = LinkedListIterator_get_item(itr_ptr);
+
+		while(id){
+			SymbolEnv_Entry *etr_ptr = SymbolEnv_Scope_entry_get_by_id(scp_ptr, id, strlen(id));
+
+			void *type_ptr = SymbolEnv_Entry_get_type(etr_ptr);
+
+			etr_ptr->offset = env_ptr->memory_allocated;
+			etr_ptr->size = get_type_width(type_ptr);
+			env_ptr->memory_allocated += etr_ptr->size;
+
+			LinkedListIterator_move_to_next(itr_ptr);
+			id = LinkedListIterator_get_item(itr_ptr);
+		}
+
+		LinkedListIterator_destroy(itr_ptr);
+		scp_ptr = SymbolEnv_Scope_get_inorder(scp_ptr);
+	}
 }

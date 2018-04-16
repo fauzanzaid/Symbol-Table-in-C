@@ -130,7 +130,7 @@ SymbolEnv_Scope *SymbolEnv_Scope_get_parent(SymbolEnv_Scope *scp_ptr);
  * @return          Returns a pointer to entry created, NULL if an
  * entry with same id already exists.
  */
-SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, int size, void *type_ptr);
+SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, void *type_ptr);
 
 /**
  * Fetch an entry by it's identifier
@@ -164,6 +164,13 @@ SymbolEnv_Scope *SymbolEnv_Entry_get_scope(SymbolEnv_Entry *etr_ptr);
 void SymbolEnv_Entry_set_flag_initialized(SymbolEnv_Entry *etr_ptr);
 
 int SymbolEnv_Entry_get_flag_initialized(SymbolEnv_Entry *etr_ptr);
+
+
+////////////
+// Layout //
+////////////
+
+void SymbolEnv_layout_memory(SymbolEnv *env_ptr, int(*get_type_width)(void *) );
 
 
 #endif
