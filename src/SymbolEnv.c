@@ -348,7 +348,7 @@ SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, v
 		return NULL;
 	}
 
-	LinkedList_push(scp_ptr->id_lst_ptr, etr_ptr->id);
+	LinkedList_pushback(scp_ptr->id_lst_ptr, etr_ptr->id);
 	HashTable_add(scp_ptr->tbl_ptr, etr_ptr->id, etr_ptr);
 
 	return etr_ptr;
