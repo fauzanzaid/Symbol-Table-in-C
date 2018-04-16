@@ -34,7 +34,7 @@ typedef struct SymbolEnv_Entry SymbolEnv_Entry;
  * of symbol tables. The scope is the home scope
  * @return Pointer to struct
  */
-SymbolEnv *SymbolEnv_new();
+SymbolEnv *SymbolEnv_new(char *name, int len_name);
 
 /**
  * Deallocates all internally allocated memory along with freeing all
@@ -101,6 +101,8 @@ SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr);
 SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr);
 
 char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr);
+
+SymbolEnv_Entry *SymbolEnv_Scope_entry_get_by_id(SymbolEnv_Scope *scp_ptr, char *id, int len_id);
 
 LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr);
 

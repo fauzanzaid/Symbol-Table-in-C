@@ -75,10 +75,10 @@ static int key_compare(void *key1, void *key2);
 // Constructors and Destructors //
 //////////////////////////////////
 
-SymbolEnv *SymbolEnv_new(){
+SymbolEnv *SymbolEnv_new(char *name, int len_name){
 	SymbolEnv *env_ptr = malloc( sizeof(SymbolEnv) );
 
-	env_ptr->scp_root_ptr = SymbolEnv_Scope_new(env_ptr, NULL, 0);
+	env_ptr->scp_root_ptr = SymbolEnv_Scope_new(env_ptr, name, len_name);
 	env_ptr->scp_cur_ptr = env_ptr->scp_root_ptr;
 	env_ptr->scp_last_child_ptr = NULL;
 
@@ -274,6 +274,15 @@ char* SymbolEnv_Scope_get_name(SymbolEnv_Scope *scp_ptr){
 	return scp_ptr->name;
 }
 
+SymbolEnv_Entry *SymbolEnv_Scope_entry_get_by_id(SymbolEnv_Scope *scp_ptr, char *id, int len_id){
+	// Add null terminator
+	char id_2[len_id+1];
+	strncpy(id_2, id, len_id);
+	id_2[len_id] = '\0';
+
+	return HashTable_get(scp_ptr->tbl_ptr, id_2);
+}
+
 LinkedList *SymbolEnv_Scope_get_id_lst(SymbolEnv_Scope *scp_ptr){
 	return scp_ptr->id_lst_ptr;
 }
@@ -361,7 +370,6 @@ SymbolEnv_Entry *SymbolEnv_entry_get_by_id(SymbolEnv *env_ptr, char *id, int len
 	return NULL;
 }
 
-
 int SymbolEnv_entry_set_flag_initialized_by_id(SymbolEnv *env_ptr, char *id, int len_id){
 	SymbolEnv_Entry *etr_ptr = SymbolEnv_entry_get_by_id(env_ptr, id, len_id);
 
@@ -381,7 +389,6 @@ int SymbolEnv_entry_get_flag_initialized_by_id(SymbolEnv *env_ptr, char *id, int
 
 	return etr_ptr->flag_initialized;
 }
-
 
 char *SymbolEnv_Entry_get_id(SymbolEnv_Entry *etr_ptr){
 	return etr_ptr->id;
