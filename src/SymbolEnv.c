@@ -135,8 +135,6 @@ static void SymbolEnv_Scope_destroy(SymbolEnv_Scope *scp_ptr){
 
 	char *id = LinkedListIterator_get_item(itr_ptr);
 	while(id != NULL){
-		printf("%p %s\n", id, id);
-
 		SymbolEnv_Entry *etr_ptr = HashTable_get(scp_ptr->tbl_ptr, id);
 		SymbolEnv_Entry_destroy(etr_ptr);
 
@@ -330,6 +328,9 @@ SymbolEnv_Entry *SymbolEnv_entry_add(SymbolEnv *env_ptr, char *id, int len_id, i
 
 	if( HashTable_get(scp_ptr->tbl_ptr, etr_ptr->id) != NULL){
 		// Symbol already exists in current scope
+
+		// Need to free id in etr as it will not be added to linked list
+		free(etr_ptr->id);
 		SymbolEnv_Entry_destroy(etr_ptr);
 		return NULL;
 	}
