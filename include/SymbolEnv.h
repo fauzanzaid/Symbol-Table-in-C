@@ -91,6 +91,8 @@ SymbolEnv_Scope *SymbolEnv_scope_reset(SymbolEnv *env_ptr);
  */
 SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr);
 
+SymbolEnv_Scope *SymbolEnv_scope_get_root(SymbolEnv *env_ptr);
+
 /**
  * Sets the environment's scope to the scope whose reference pointer is given.
  * All sub scopes are now considered unvisited for dfs traversal

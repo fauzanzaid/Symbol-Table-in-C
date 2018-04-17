@@ -266,6 +266,10 @@ SymbolEnv_Scope *SymbolEnv_scope_get_current(SymbolEnv *env_ptr){
 	return env_ptr->scp_cur_ptr;
 }
 
+SymbolEnv_Scope *SymbolEnv_scope_get_root(SymbolEnv *env_ptr){
+	return env_ptr->scp_root_ptr;
+}
+
 SymbolEnv_Scope *SymbolEnv_scope_set_explicit(SymbolEnv *env_ptr, SymbolEnv_Scope *scp_ptr){
 	if(scp_ptr->env_ptr != env_ptr)
 		return NULL;
