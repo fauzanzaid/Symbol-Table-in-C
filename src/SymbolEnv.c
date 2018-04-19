@@ -460,6 +460,7 @@ static int key_compare(void *key1, void *key2){
 
 void SymbolEnv_layout_memory(SymbolEnv *env_ptr, int(*get_type_width)(void *) ){
 	SymbolEnv_Scope *scp_ptr = env_ptr->scp_root_ptr;
+	env_ptr->memory_allocated = 0;
 
 	while(scp_ptr){
 		LinkedList *id_lst_ptr = SymbolEnv_Scope_get_id_lst(scp_ptr);
