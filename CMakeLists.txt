@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project( SymbolEnv VERSION 0.1.1 )
+project( SymbolEnv VERSION 0.1.0 )
 
 add_library(SymbolEnv STATIC src/SymbolEnv.c)
 
